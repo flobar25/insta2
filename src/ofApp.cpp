@@ -8,6 +8,22 @@ void ofApp::setup(){
     ofSetFrameRate(30);
     midiIn.openPort(0);
     midiIn.addListener(this);
+    backgroundColor = ofColor::black;
+    lineColor = ofColor::ghostWhite;
+    lineWidth = 2;
+    squareDimension = 40;
+    
+    ofSetBackgroundColor(backgroundColor);
+    ofSetColor(lineColor);
+    ofSetLineWidth(lineWidth);
+    
+    // init states
+    for (int i = 0; i < ARRAY_SIZE; i++){
+        for (int j = 0; j < ARRAY_SIZE; j++){
+            rectanglesStates[i][j] = 0;
+        }
+    }
+    
 }
 
 void ofApp::exit(){
@@ -21,11 +37,33 @@ void ofApp::update(){
     std::stringstream strm;
     strm << "fps: " << ofGetFrameRate();
     ofSetWindowTitle(strm.str());
+    
+    if (recording){
+        //Boolean shouldMoveASquare = true;
+        for (int i = 0; i < ARRAY_SIZE; i++){
+            for (int j = 0; j < ARRAY_SIZE; j++){
+                //shouldMoveASquare &= rectanglesStates[i][j] == 0;
+                if (rectanglesStates[i][j] > 0){
+                    rectanglesStates[i][j]--;
+                } else {
+                    rectanglesStates[i][j] = ofRandom(1000);
+                }
+            }
+        }
+    }
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
     cam.begin();
+    for (int i = 0; i < ARRAY_SIZE; i++){
+        for (int j = 0; j < ARRAY_SIZE; j++){
+            int x =  (i - (ARRAY_SIZE/2)) * squareDimension;
+            int y =  (j - (ARRAY_SIZE/2)) * squareDimension;
+            int z =  sin(rectanglesStates[i][j] / 100.0) * 100;
+            drawRectangle(glm::vec3(x, y, z), squareDimension, squareDimension, backgroundColor, lineColor, lineWidth);
+        }
+    }
     cam.end();
     
     // capture the image if recording is started
@@ -35,6 +73,16 @@ void ofApp::draw(){
         screenCapture.grabScreen(0, 0, ofGetWidth(), ofGetHeight());
         recorder.addFrame(screenCapture);
     }
+}
+
+void ofApp::drawRectangle(glm::vec3 location, int height, int width, ofColor fillColor, ofColor lineColor, int lineWidth) {
+    ofFill();
+    ofSetColor(fillColor);
+    ofDrawRectangle(location, height - lineWidth, width - lineWidth);
+    
+    ofNoFill();
+    ofSetColor(lineColor);
+    ofDrawRectangle(location, height, width);
 }
 
 //--------------------------------------------------------------

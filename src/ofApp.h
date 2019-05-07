@@ -4,6 +4,8 @@
 #include "ofxMidi.h"
 #include "ofxImageSequenceRecorder.h"
 
+#define ARRAY_SIZE 8
+
 class ofApp : public ofBaseApp, public ofxMidiListener {
     
 public:
@@ -31,6 +33,8 @@ public:
     void dragEvent(ofDragInfo dragInfo);
     void gotMessage(ofMessage msg);
     
+    void drawRectangle(glm::vec3 location, int height, int width, ofColor fillColor, ofColor lineColor, int lineWidth);
+    
 
     
 private:
@@ -44,4 +48,13 @@ private:
     ofxImageSequenceRecorder recorder;
     Boolean recording;
     ofImage screenCapture;
+    
+    // colors
+    ofColor backgroundColor;
+    ofColor lineColor;
+    int lineWidth;
+    int squareDimension;
+    
+    // rectangles
+    int rectanglesStates[ARRAY_SIZE][ARRAY_SIZE];
 };
