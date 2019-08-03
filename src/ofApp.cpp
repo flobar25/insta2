@@ -5,7 +5,7 @@ void ofApp::setup(){
     recorder.setPrefix(ofToDataPath("recording/frame_"));
     recorder.setFormat("bmp");
     recorder.startThread();
-    ofSetFrameRate(30);
+    ofSetFrameRate(60);
     midiIn.openPort(0);
     midiIn.addListener(this);
     backgroundColor = ofColor::black;
@@ -13,14 +13,20 @@ void ofApp::setup(){
     lineWidth = 2;
     squareDimension = 40;
     
+    cam.setDistance(0);
+    cam.setNearClip(0);
+    cam.setFarClip(10000000);
+    
+                    
+    
     ofSetBackgroundColor(backgroundColor);
     ofSetColor(lineColor);
     ofSetLineWidth(lineWidth);
     
     // init states
-    for (int i = 0; i < ARRAY_SIZE; i++){
-        for (int j = 0; j < ARRAY_SIZE; j++){
-            rectanglesStates[i][j] = 0;
+    for (int i = 0; i < COLUMNS_SIZE; i++){
+        for (int j = 0; j < ROWS_SIZE; j++){
+            rectanglesStates[i][j] = Z_MAX / (i + 1);
         }
     }
     
@@ -34,20 +40,20 @@ void ofApp::exit(){
 //--------------------------------------------------------------
 void ofApp::update(){
     // show the framerate on window title
-    std::stringstream strm;
-    strm << "fps: " << ofGetFrameRate();
-    ofSetWindowTitle(strm.str());
+//    std::stringstream strm;
+//    strm << "fps: " << ofGetFrameRate();
+//    ofSetWindowTitle(strm.str());
     
-    if (recording){
+    if (started){
         //Boolean shouldMoveASquare = true;
-        for (int i = 0; i < ARRAY_SIZE; i++){
-            for (int j = 0; j < ARRAY_SIZE; j++){
+        for (int i = 0; i < COLUMNS_SIZE; i++){
+            for (int j = 0; j < ROWS_SIZE; j++){
                 //shouldMoveASquare &= rectanglesStates[i][j] == 0;
-                if (rectanglesStates[i][j] > 0){
+                //if (rectanglesStates[i][j] > 0){
                     rectanglesStates[i][j]--;
-                } else {
-                    rectanglesStates[i][j] = ofRandom(1000);
-                }
+//                } else {
+//                    rectanglesStates[i][j] = ofRandom(1000);
+//                }
             }
         }
     }
@@ -56,11 +62,12 @@ void ofApp::update(){
 //--------------------------------------------------------------
 void ofApp::draw(){
     cam.begin();
-    for (int i = 0; i < ARRAY_SIZE; i++){
-        for (int j = 0; j < ARRAY_SIZE; j++){
-            int x =  (i - (ARRAY_SIZE/2)) * squareDimension;
-            int y =  (j - (ARRAY_SIZE/2)) * squareDimension;
-            int z =  sin(rectanglesStates[i][j] / 100.0) * 100;
+    for (int i = 0; i < COLUMNS_SIZE; i++){
+        for (int j = 0; j < ROWS_SIZE; j++){
+            auto variable1 = tan(rectanglesStates[i][j] / 100.0);
+            int z =  variable1 * Z_MAX;
+            int x =  (i - (COLUMNS_SIZE/2)) * squareDimension;
+            int y =  (j - (ROWS_SIZE/2)) * squareDimension;
             drawRectangle(glm::vec3(x, y, z), squareDimension, squareDimension, backgroundColor, lineColor, lineWidth);
         }
     }
@@ -93,6 +100,9 @@ void ofApp::keyPressed(int key) {
             break;
         case 'p':
             captureScreen();
+            break;
+        case 's':
+            toggleStarted();
             break;
         default:
             break;
@@ -160,5 +170,9 @@ void ofApp::dragEvent(ofDragInfo dragInfo){
 
 void ofApp::toggleRecording(){
     recording = !recording;
+}
+
+void ofApp::toggleStarted(){
+    started = !started;
 }
 

@@ -4,7 +4,9 @@
 #include "ofxMidi.h"
 #include "ofxImageSequenceRecorder.h"
 
-#define ARRAY_SIZE 8
+#define ROWS_SIZE 16
+#define COLUMNS_SIZE 100
+#define Z_MAX 1000
 
 class ofApp : public ofBaseApp, public ofxMidiListener {
     
@@ -16,13 +18,14 @@ public:
     
     // recording
     void toggleRecording();
+    void toggleStarted();
     void captureScreen();
     
     // MIDI
     void newMidiMessage(ofxMidiMessage& eventArgs);
-    
-    void keyPressed(int key);
+        void keyPressed(int key);
     void keyReleased(int key);
+    
     void mouseMoved(int x, int y );
     void mouseDragged(int x, int y, int button);
     void mousePressed(int x, int y, int button);
@@ -47,6 +50,7 @@ private:
     // recording
     ofxImageSequenceRecorder recorder;
     Boolean recording;
+    Boolean started;
     ofImage screenCapture;
     
     // colors
@@ -56,5 +60,5 @@ private:
     int squareDimension;
     
     // rectangles
-    int rectanglesStates[ARRAY_SIZE][ARRAY_SIZE];
+    int rectanglesStates[COLUMNS_SIZE][ROWS_SIZE];
 };
